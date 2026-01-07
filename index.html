@@ -1,58 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<style>
-  body {
-    height: 100vh;
-    margin: 0;
-    overflow: hidden;
-    background: #111;
-    cursor: none; /* Hides the real mouse */
-  }
+    <meta charset="UTF-8">
+    <title>Animated Image Cursor</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: #000;
+            overflow: hidden;
+            cursor: none; /* Hides default mouse */
+        }
 
-  #jumping-image {
-    position: fixed;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    pointer-events: none; /* Prevents image from blocking clicks */
-    z-index: 9999;
-    transition: transform 0.1s linear; /* Smooths the movement */
-  }
+        #follower {
+            position: fixed;
+            width: 80px; /* Adjust size here */
+            height: auto;
+            pointer-events: none;
+            z-index: 1000;
+            transition: transform 0.1s ease-out;
+            /* Cool entrance animation */
+            filter: drop-shadow(0 0 10px cyan);
+        }
 
-  /* Initial "Cool" Jumping Animation */
-  .jump {
-    animation: crazyJump 1s infinite alternate ease-in-out;
-  }
-
-  @keyframes crazyJump {
-    0% { top: 10%; left: 10%; transform: rotate(0deg) scale(1); }
-    50% { top: 50%; left: 80%; transform: rotate(180deg) scale(1.5); }
-    100% { top: 80%; left: 30%; transform: rotate(360deg) scale(0.8); }
-  }
-</style>
+        /* Initial jumping animation */
+        .jumping {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        }
+    </style>
 </head>
 <body>
 
-<img id="jumping-image" class="jump" src="picsum.photos" alt="cursor">
+    <img id="follower" src="https://cached.imagescaler.hbpl.co.uk/resize/scaleWidth/743/cached.offlinehbpl.hbpl.co.uk/news/OMC/C785C365-DB1F-ABBE-BEF5F76B8E2868E1.jpg" alt="cursor">
 
-<script>
-  const img = document.getElementById('jumping-image');
+    <script>
+        const img = document.getElementById('follower');
+        let isFollowing = false;
 
-  // Change image randomly on every reload
-  img.src = `picsum.photos?random=${Math.random()}`;
+        // 1. Random Jumping Phase
+        function jumpRandomly() {
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 100);
+            const rotation = Math.random() * 360;
+            
+            img.classList.add('jumping');
+            img.style.left = x + 'px';
+            img.style.top = y + 'px';
+            img.style.transform = `rotate(${rotation}deg) scale(${Math.random() + 0.5})`;
+        }
 
-  // After 2 seconds, stop jumping and follow the mouse
-  setTimeout(() => {
-    img.classList.remove('jump');
-    
-    document.addEventListener('mousemove', (e) => {
-      // Offset by half width/height to center on cursor
-      img.style.left = (e.clientX - 30) + 'px';
-      img.style.top = (e.clientY - 30) + 'px';
-    });
-  }, 2000);
-</script>
+        // Jump every 400ms for 3 seconds
+        const jumpInterval = setInterval(jumpRandomly, 400);
 
+        // 2. Mouse Tracking Phase
+        setTimeout(() => {
+            clearInterval(jumpInterval);
+            img.classList.remove('jumping');
+            isFollowing = true;
+            
+            // Return to normal scale/rotation when following
+            img.style.transform = 'rotate(0deg) scale(1)';
+        }, 3000);
+
+        document.addEventListener('mousemove', (e) => {
+            if (isFollowing) {
+                // Centers the image on the cursor
+                img.style.left = (e.clientX - img.offsetWidth / 2) + 'px';
+                img.style.top = (e.clientY - img.offsetHeight / 2) + 'px';
+            }
+        });
+    </script>
 </body>
 </html>
