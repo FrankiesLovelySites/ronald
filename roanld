@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body {
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    background: #111;
+    cursor: none; /* Hides the real mouse */
+  }
+
+  #jumping-image {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    pointer-events: none; /* Prevents image from blocking clicks */
+    z-index: 9999;
+    transition: transform 0.1s linear; /* Smooths the movement */
+  }
+
+  /* Initial "Cool" Jumping Animation */
+  .jump {
+    animation: crazyJump 1s infinite alternate ease-in-out;
+  }
+
+  @keyframes crazyJump {
+    0% { top: 10%; left: 10%; transform: rotate(0deg) scale(1); }
+    50% { top: 50%; left: 80%; transform: rotate(180deg) scale(1.5); }
+    100% { top: 80%; left: 30%; transform: rotate(360deg) scale(0.8); }
+  }
+</style>
+</head>
+<body>
+
+<img id="jumping-image" class="jump" src="picsum.photos" alt="cursor">
+
+<script>
+  const img = document.getElementById('jumping-image');
+
+  // Change image randomly on every reload
+  img.src = `picsum.photos?random=${Math.random()}`;
+
+  // After 2 seconds, stop jumping and follow the mouse
+  setTimeout(() => {
+    img.classList.remove('jump');
+    
+    document.addEventListener('mousemove', (e) => {
+      // Offset by half width/height to center on cursor
+      img.style.left = (e.clientX - 30) + 'px';
+      img.style.top = (e.clientY - 30) + 'px';
+    });
+  }, 2000);
+</script>
+
+</body>
+</html>
